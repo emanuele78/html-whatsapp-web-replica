@@ -147,8 +147,11 @@ body {
 
 /* sezione dove viene mostrato lo scambi di messaggi */
 .message_content {
+  position: relative;
   width: 100%;
   height: calc(100% - 62px - 60px);
+  overflow: auto;
+  padding: 0 80px;
 }
 
 /* sezione dove viene scritto un messaggio */
@@ -187,6 +190,7 @@ body {
 .conversations_items {
   width: 100%;
   height: calc(100% - 60px - 49px);
+  overflow: auto;
 }
 
 /* elemento della lista conversazioni */
@@ -261,4 +265,91 @@ body {
   width: 21px;
   height: 21px;
   margin-right: 12px;
+}
+
+/* singoli messaggi */
+.message_me_template,
+.message_you_template {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+  max-width: 75%;
+  padding: 10px 10px 20px;
+  font-size: 14px;
+  color: #262626;
+  border-radius: 9px;
+  box-shadow: 0 4px 4px -4px #cccccc;
+}
+
+.message_me_template:hover,
+.message_you_template:hover {}
+
+.message_you_template {
+  float: left;
+  background-color: white;
+}
+
+.message_me_template {
+  float: right;
+  background-color: #dcf8c5;
+}
+
+/* frecce messaggi */
+.message_you_template::after,
+.message_me_template::after {
+  content: "";
+  clear: both;
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 0;
+  border: 10px solid;
+}
+
+.message_you_template::after {
+  left: -10px;
+  border-color: white transparent transparent transparent;
+}
+
+.message_me_template::after {
+  right: -10px;
+  border-color: #dcf8c5 transparent transparent transparent;
+}
+
+.message_me_template .message_timestamp,
+.message_you_template .message_timestamp {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: lightgrey;
+}
+
+.message_me_template .message_timestamp>*,
+.message_you_template .message_timestamp>* {
+  vertical-align: middle;
+}
+
+.message_you_template .message_option,
+.message_me_template .message_option {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding-left: 15px;
+  padding-bottom: 15px;
+}
+
+.message_you_template:hover .message_option,
+.message_me_template:hover .message_option {
+  display: block;
+}
+
+.message_you_template .message_option {
+  background-image: linear-gradient(to bottom left, white, white, white, transparent);
+}
+
+.message_me_template .message_option {
+  background-image: linear-gradient(to bottom left, #dcf8c5, #dcf8c5, transparent);
 }
