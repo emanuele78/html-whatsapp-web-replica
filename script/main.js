@@ -31,10 +31,22 @@ var whatsappController = {
     var messageObject = this.createMessage();
     //clono il template per il messaggio
     var newMessageElement = $(".messages_templates .message_me_template").clone();
-    //imposto il testo del messaggio
+    //imposto il testo e l'ora del messaggio
     newMessageElement.find(".message_text").text(messageObject.messageContent);
+    newMessageElement.find(".message_timestamp>span").text(this.getHoursMinutes(messageObject.messageTimestamp));
     //inserisco il messaggio all'interno del container
     $(".messages_wrapper").append(newMessageElement);
+    //cancello input text
+    $(".input_message").val("");
+    //effettuo scrolling
+    $(".message_content").scrollTop($(".message_content")[0].scrollHeight);
+  },
+  //metodo che restituisce una stringa hh:mm da un oggetto data
+  getHoursMinutes: function(dateObject) {
+    var messageTime = dateObject.getHours().length == 1 ? "0" + dateObject.getHours().toString() :
+      dateObject.getHours().toString();
+    messageTime += ":" + (dateObject.getMinutes().length == 1 ? "0" + dateObject.getMinutes().toString() : dateObject.getMinutes().toString());
+    return messageTime;
   },
   //metodo che restituisce un oggetto messaggio
   createMessage: function() {
