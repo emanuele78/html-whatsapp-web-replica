@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* 2 SEZIONI PRINCIPALI */
+.conversations {
+  width: 35%;
+  height: 100%;
+  background-color: pink;
+}
+
+.message {
+  width: 65%;
+  height: 100%;
+  background-image: url("../assets/message_bkg.png");
+  background-size: 300px;
+  background-repeat: repeat;
+}
+
+/* regole comuni agli header delle 2 sezioni */
+.conversations_header,
+.message_header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 60px;
+  background-color: #eeeeee;
+}
+
+/* icone nella header */
+.conversations_header_right ul,
+.message_header_right ul {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  list-style-type: none;
+}
+
+.conversations_header_right ul li,
+.message_header_right ul li {
+  height: 100%;
+  margin-right: 25px;
+}
+
+.conversations_header_right ul li a,
+.message_header_right ul li a {
+  display: block;
+  height: 100%;
+}
+
+.conversations_header_right ul li a svg,
+.message_header_right ul li a svg {
+  height: 100%;
+}
+
+.conversations_header_left .me,
+.message_header_left .you {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-top: 10px;
+  margin-left: 15px;
+  border-radius: 50%;
+  background-size: cover;
+}
+
+/* ELEMENTI DELLA SEZIONE CONVERSATIONS */
+/* icona personale */
+.conversations_header_left .me {
+  background-image: url("../assets/me.jpg");
+}
+
+/* elementi barra di ricerca */
+.conversations_search_bar {
+  width: 100%;
+  height: 49px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #ebebeb;
+  background-color: #fbfbfb;
+}
+
+.conversations_search_bar .search_bar_fake {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.conversations_search_bar .search_bar_fake a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin-left: 16px;
+}
+
+.conversations_search_bar .search_bar_fake span {
+  font-size: 15px;
+  color: #a4a4a4;
+  margin-left: 16px;
+}
+
+/* elemento della lista conversazioni */
+.conversations_item {
+  width: 100%;
+  height: 72px;
+  background-color: white;
+}
+
+/* ELEMENTI DELLA SEZIONE MESSAGE */
+.message_header {
+  border-left: 2px solid #dbdbdb;
+  box-shadow: 0 2px 2px -2px #cccccc;
+}
+
+/* message header */
+.message_header_left {
+  display: flex;
+  justify-content: space-between;
+}
+
+.message_header_left .you {
+  background-image: url("../assets/giorgio.jpg");
+}
+
+.message_header_left .message_header_status {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 15px;
+}
+
+.message_header_status a.message_header_name {
+  text-decoration: none;
+  font-size: 16px;
+  color: black;
+}
+
+.message_header_status a.last_access {
+  padding-top: 5px;
+  text-decoration: none;
+  font-size: 13px;
+  color: #5f5f5f;
+}
