@@ -154,6 +154,13 @@ body {
   padding: 0 80px;
 }
 
+.messages_wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
 /* sezione dove viene scritto un messaggio */
 .message_compose {
   display: flex;
@@ -171,7 +178,7 @@ body {
   margin: 0 16px;
 }
 
-.message_compose .message_text {
+.message_compose .input_message {
   flex-grow: 1;
   padding: 10px;
   border: none;
@@ -267,30 +274,31 @@ body {
   margin-right: 12px;
 }
 
-/* singoli messaggi */
+/* TEMPLATE SINGOLI MESSAGGI */
+.messages_templates {
+  display: none;
+}
+
 .message_me_template,
 .message_you_template {
   position: relative;
-  display: inline-block;
   margin-top: 10px;
   max-width: 75%;
-  padding: 10px 10px 20px;
+  min-width: 100px;
+  padding: 10px 10px 25px;
   font-size: 14px;
   color: #262626;
   border-radius: 9px;
   box-shadow: 0 4px 4px -4px #cccccc;
 }
 
-.message_me_template:hover,
-.message_you_template:hover {}
-
 .message_you_template {
-  float: left;
+  align-self: flex-start;
   background-color: white;
 }
 
 .message_me_template {
-  float: right;
+  align-self: flex-end;
   background-color: #dcf8c5;
 }
 
@@ -298,7 +306,6 @@ body {
 .message_you_template::after,
 .message_me_template::after {
   content: "";
-  clear: both;
   position: absolute;
   width: 0;
   height: 0;
