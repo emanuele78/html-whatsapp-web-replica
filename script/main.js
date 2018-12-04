@@ -1,8 +1,5 @@
 //solo per test
 "use strict";
-
-
-
 var whatsappController = {
   //metodo iniziale
   initializeController: function() {
@@ -20,19 +17,42 @@ var whatsappController = {
   //metodo che crea le conversazioni finte
   createFakeThreads: function() {
     //queste sono le conversazioni presenti, nell'array è memorizzato il nome del destinatario e la il nome dell'immagine
-    var startedThreads = [
-      ["Riccardo Silvi", "t1.jpg"],
-      ["Federica Stella", "t2.jpg"],
-      ["Chiara Passaro", "t4.jpg"],
-      ["Gianluca Bianco", "t3.jpg"],
-      ["Matteo Pelosi", "t5.jpg"],
-      ["Mario Rossi", "t6.jpg"],
-      ["Franco Franchi", "t7.jpg"],
-      ["Giorgio Trobbiani", "t8.jpg"]
+    var startedThreads = [{
+        threadName: "Riccardo Silvi",
+        threadImage: "t1.jpg"
+      },
+      {
+        threadName: "Federica Stella",
+        threadImage: "t2.jpg"
+      },
+      {
+        threadName: "Gianluca Bianco",
+        threadImage: "t3.jpg"
+      },
+      {
+        threadName: "Chiara Passaro",
+        threadImage: "t4.jpg"
+      },
+      {
+        threadName: "Matteo Pelosi",
+        threadImage: "t5.jpg"
+      },
+      {
+        threadName: "Mario Rossi",
+        threadImage: "t6.jpg"
+      },
+      {
+        threadName: "Franco Franchi",
+        threadImage: "t7.jpg"
+      },
+      {
+        threadName: "Giorgio Trobbiani",
+        threadImage: "t8.jpg"
+      }
     ];
     //per ogni elemento dell'array creo una conversazione fittizia fatta da un numero random di scambio messaggi e la pusho nell'array stesso
     for (var i = 0; i < startedThreads.length; i++) {
-      startedThreads[i].push(this.getFakeConversation(this.getIntRandomNumber(8, 20)));
+      startedThreads[i].threadMessages = this.getFakeConversation(this.getIntRandomNumber(8, 20));
     }
     this.startedThreads = startedThreads;
     console.log(this.startedThreads);
@@ -59,15 +79,15 @@ var whatsappController = {
     var targetElement = $(".conversations_items");
     for (var i = 0; i < this.startedThreads.length; i++) {
       //conversazione corrente
-      var currentThread = this.startedThreads[i];
+      var threadObject = this.startedThreads[i];
       //template clonato
       var clonedElement = $(".conversations_items .template .conversation_item_template").clone();
       //imposto il nome della persona con cui si ha la conversazione
-      clonedElement.find(".item_name").text(currentThread[0]);
+      clonedElement.find(".item_name").text(threadObject.threadName);
       //imposto l'immagine della persona
-      clonedElement.find(".item_image img").attr("src", "assets/" + currentThread[1]);
+      clonedElement.find(".item_image img").attr("src", "assets/" + threadObject.threadImage);
       //imposto un chunck dell'ultima conversazione
-      var lastMessage = currentThread[2][currentThread[2].length - 1];
+      var lastMessage = threadObject.threadMessages[threadObject.threadMessages.length - 1];
       clonedElement.find(".item_message_part").text(lastMessage.messageContent);
       //imposto l'ora dell'ultima conversazione
       //se il timestamp dell'ultimo messaggio è di oggi, allora visualizzo l'ora altrimenti la data gg/mm/aaaa
@@ -198,7 +218,7 @@ var whatsappController = {
     //caricamento delle info generali sulla conversazione (nome, ultimo accesso, foto)
     this.loadSingleThreadInfo(threadToLoad);
     //caricamento dei messaggi del thread
-    var threadMessages = threadToLoad[2];
+    var threadMessages = threadToLoad.threadMessages;
     for (var i = 0; i < threadMessages.length; i++) {
       this.loadSingleMessage(threadMessages[i]);
     }
@@ -222,9 +242,9 @@ var whatsappController = {
     //ottengo la stringa "ultima accesso..." calcolata in modo casuale sul tempo attuale meno un numero random di minuti
     var lastSeen = "ultimo accesso oggi alle " + this.getLastAccess();
     //carico le info della conversazione sull'header (foto, nome, ultime accesso)
-    $(".message_header_status .message_header_name").text(threadToLoad[0]);
+    $(".message_header_status .message_header_name").text(threadToLoad.threadName);
     $(".message_header_status .last_access").text(lastSeen);
-    $(".message_header_left .you > img").attr("src", "assets/" + threadToLoad[1]);
+    $(".message_header_left .you > img").attr("src", "assets/" + threadToLoad.threadImage);
   },
   //metodo che gestisce le azimazioni sull'input message (microfono che si trasforma in freccia)
   handleAnimationOnInputMessage: function(keyevent) {
