@@ -6,9 +6,90 @@
 }
 
 body {
-  display: flex;
   width: 100vw;
   height: 100vh;
+  display: flex;
+}
+
+/* splash screen */
+.splash_screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f2f2f2;
+  font-size: 50px;
+  color: #acb9be;
+}
+
+.splash_screen_loading_bar {
+  position: relative;
+  width: 500px;
+  height: 4px;
+  margin-top: 150px;
+  background-color: #e0e4e5;
+}
+
+.splash_screen_loaded_bar {
+  position: absolute;
+  width: 0;
+  height: 100%;
+  background-color: #28d1a6;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+  animation-duration: 3s;
+  animation-name: splash_animation;
+}
+
+@keyframes splash_animation {
+  0% {
+    width: 0;
+  }
+
+  50% {
+    width: 50%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+.main_content_wrapper {
+  display: flex;
+  max-width: 1440px;
+  height: 96%;
+  margin: auto;
+}
+
+@media screen and (max-width:1439px) {
+  .main_content_wrapper {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* classi per il motivo in background */
+.background_pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  background-color: #d9dbd5;
+}
+
+.background_pattern .background_pattern_bar {
+  width: 100%;
+  height: 125px;
+  background-color: #1a9688;
 }
 
 /* 2 SEZIONI PRINCIPALI */
@@ -204,6 +285,7 @@ body {
   width: 100%;
   height: calc(100% - 60px - 49px);
   overflow: auto;
+  background-color: white;
 }
 
 /* elemento della lista conversazioni */
@@ -292,7 +374,8 @@ body {
   border-radius: 50%;
   text-align: center;
   font-size: 14px;
-  background-color: red;
+  color: white;
+  background-color: #28d26b;
 }
 
 /* TEMPLATE SINGOLI MESSAGGI */

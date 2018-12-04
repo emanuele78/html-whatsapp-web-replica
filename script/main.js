@@ -1,6 +1,16 @@
 var whatsappController = {
   initializeController: function() {
+    //rimuovo splash screen
+    this.discardSplashScreen();
+    //collego gli handler
     this.attachHandlers();
+  },
+  discardSplashScreen: function() {
+    //leggo il valore impostato nella proprietà animation-duration dello splash screen, quindi creo un timer che lo nasconda dopo il tempo impostato
+    var duration = parseInt($(".splash_screen_loaded_bar").css("animation-duration"));
+    setTimeout(function() {
+      $(".splash_screen").hide();
+    }, duration * 1000);
   },
   //metodo che collega i listener
   attachHandlers: function() {
