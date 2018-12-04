@@ -2,9 +2,12 @@
 "use strict";
 var whatsappController = {
   //proprietà dell'oggetto
-  //range in secondi relativo al tempo massimo e al tempo minimo di auto risposta nella conversazione
+  //range in secondi entro il quale l'altro utente riceve il messaggio inviato
   minDelayReply: 2,
   maxDelayReply: 3,
+  //tempo in secondi (statico) impiegato dall'altro utente, una volta ricevuto il messaggio, per rispondere. Per semplificare, il tempo che trascorre per ricevere una risposta automatica fake è dato da random(minDelayReply, maxDelayReply)+fixedDelay
+  fixedDelay: 3,
+  writingMessage: "Sto scrivendo...",
   //metodo iniziale
   initializeController: function() {
     //inizializzo proprietà dell'oggetto che contiene una lista messaggi fake da dove pescare messaggi random
@@ -192,7 +195,7 @@ var whatsappController = {
     });
     //handler per il click sul menu contestuale del messaggio
     $(".message_option").click(function() {
-      $(".message_option_menu").slideToggle(200);
+      // $(".message_option_menu").slideToggle(200);
     });
     //handler per i click sugli elementi conversazione
     $(".conversation_item_template").click(function() {
@@ -226,7 +229,9 @@ var whatsappController = {
     for (var i = 0; i < threadMessages.length; i++) {
       this.loadSingleMessage(threadMessages[i]);
     }
-    // TODO: cancellare il valore di unread message count
+    //cancello il valore di eventuali messaggi non letti e nascondo segnalino
+    this.showUnreadedMessageCount(threadIndex + 1, false);
+    threadToLoad.unreadedMessageCount = 0;
   },
   //metodo che prepara al caricamento dei messaggi per una conversazione scelta dall'utente
   prepareForLoadSingleThread: function(threadIndex) {
@@ -245,11 +250,14 @@ var whatsappController = {
   },
   //metodo che carica le informazioni su una conversazione
   loadSingleThreadInfo: function(threadToLoad) {
-    //ottengo la stringa "ultima accesso..." calcolata in modo casuale sul tempo attuale meno un numero random di minuti
-    var lastSeen = "ultimo accesso oggi alle " + this.getLastAccess();
     //carico le info della conversazione sull'header (foto, nome, ultime accesso)
     $(".message_header_status .message_header_name").text(threadToLoad.threadName);
-    $(".message_header_status .last_access").text(lastSeen);
+    //controllo se sta scrivendo
+    if ("iAmWritingCount" in threadToLoad && threadToLoad.iAmWritingCount > 0) {
+      $(".message_header_status .last_access").text(this.writingMessage);
+    } else {
+      $(".message_header_status .last_access").text(this.getLastAccess());
+    }
     $(".message_header_left .you > img").attr("src", "assets/" + threadToLoad.threadImage);
   },
   //metodo che gestisce le azimazioni sull'input message (microfono che si trasforma in freccia)
@@ -276,6 +284,8 @@ var whatsappController = {
     $(".input_message").val("");
     //memorizzo messaggio nella conversazione corrente
     this.startedThreads[this.openedThreadIndex - 1].threadMessages.push(messageObject);
+    //chiamo procedura per generare una risposta automatica
+    this.createFakeReply(this.openedThreadIndex);
   },
   // metodo che carica un singolo oggetto messaggio nella conversazione
   loadSingleMessage: function(message) {
@@ -304,7 +314,7 @@ var whatsappController = {
   getLastAccess: function() {
     var nowTime = new Date();
     nowTime.setMinutes(nowTime.getMinutes() - this.getIntRandomNumber(10, 100));
-    return this.getHoursMinutes(nowTime);
+    return "ultimo accesso oggi alle " + this.getHoursMinutes(nowTime);
   },
   //metodo che restituisce l'oggetto messaggio inviato dall'utente
   createMessage: function(messageDate, messageText, messageFromMe) {
@@ -314,8 +324,84 @@ var whatsappController = {
       isMyMessage: messageFromMe
     }
     return message;
-  }
+  },
   //metodo che genera una risposta fake quando l'utente invia un messaggio
+  createFakeReply: function(callingIndex) {
+    //closure
+    var thisObject = this;
+    //il delay della risposta è espresso in sec
+    var delay = this.getIntRandomNumber(this.minDelayReply, this.maxDelayReply);
+    setTimeout(function() {
+      //genero un nuovo oggetto messaggio con data attuale e testo casuale
+      var incomingMessage = thisObject.createMessage(new Date(), thisObject.sampleMessages[thisObject.getIntRandomNumber(0, thisObject.sampleMessages.length - 1)], false);
+      //utilizzo call per impostare l'oggetto this mel metodo chiamato
+      thisObject.askToSomeoneToStartWritingAMessage.call(thisObject, incomingMessage, callingIndex);
+    }, delay * 1000);
+  },
+  //questo metodo simula la scrittura da parte dell'altra persona
+  askToSomeoneToStartWritingAMessage: function(incomingMessage, threadIndex) {
+    //imposto nel thread che l'altro utente sta scrivendo. Viene usato un numero intero per tenere traccia del numero dei messaggi da rispondere
+    //controllo se la proprietà esiste
+    console.log("Ho iniziato a risponderti");
+    if ("iAmWritingCount" in this.startedThreads[threadIndex - 1]) {
+      //esiste quindi la posso incrementare
+      this.startedThreads[threadIndex - 1].iAmWritingCount++;
+    } else {
+      //non esiste quindi la imposto a 1
+      this.startedThreads[threadIndex - 1].iAmWritingCount = 1;
+    }
+    //se il thread corrente è lo stesso thread a cui si sta rispondendo, modifico l'head
+    if (threadIndex == this.openedThreadIndex) {
+      $(".message_header_status a.last_access").text(this.writingMessage);
+    }
+    //aspetto un tempo (fisso) per simulare la scrittura dell'altro utente
+    //closure
+    var thisObject = this;
+    setTimeout(function() {
+      thisObject.messageReceived.call(thisObject, incomingMessage, threadIndex);
+    }, thisObject.fixedDelay * 1000);
+  },
+  //questo metodo gestisce il messaggio in ingresso (quello generato in automatico dopo che ne è stato inviato uno)
+  messageReceived: function(incomingMessage, threadIndex) {
+    //salvo il messaggio ricevuto nel thread
+    this.startedThreads[threadIndex - 1].threadMessages.push(incomingMessage);
+    //se la conversazione attualmente aperta è relativa al messaggio in ingresso, inserisco il messaggio nel container e lo stampo a video
+    console.log("messaggio ricevuto dall'utente");
+    if (threadIndex == this.openedThreadIndex) {
+      //aggiungo il messaggio nel container
+      this.loadSingleMessage(incomingMessage);
+    } else {
+      //devo mostrare segnalino con numero messaggi non letti
+      this.addUnreadedMessageToThread(threadIndex);
+    }
+    //decremento valore iAmWritingCount, se il valore arriva a zero tolgo la scritta Sto scrivendo
+    if (--this.startedThreads[threadIndex - 1].iAmWritingCount == 0) {
+      $(".message_header_status a.last_access").text(this.getLastAccess());
+    }
+  },
+  addUnreadedMessageToThread: function(threadIndex) {
+    if ("unreadedMessageCount" in this.startedThreads[threadIndex - 1]) {
+      //la proprietà esiste - incremento il valore
+      this.startedThreads[threadIndex - 1].unreadedMessageCount++;
+    } else {
+      //la proprietà non esiste, il valore è 1
+      this.startedThreads[threadIndex - 1].unreadedMessageCount = 1;
+    }
+    //chiamo il metodo per mostrare il valore
+    this.showUnreadedMessageCount(threadIndex, true)
+  },
+  showUnreadedMessageCount: function(threadIndex, show) {
+    var element = $(".conversation_item_template").eq(threadIndex).find(".item_info_unreaded");
+    if (show) {
+      //rendo visibile
+      element.css("display", "inline-block");
+      //imposto il contenuto
+      element.text(this.startedThreads[threadIndex - 1].unreadedMessageCount);
+    } else {
+      //nascondo
+      element.hide();
+    }
+  }
 }
 
 $(document).ready(function() {
