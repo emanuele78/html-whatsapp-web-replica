@@ -367,6 +367,7 @@ body {
   right: 8px;
   padding-left: 15px;
   padding-bottom: 15px;
+  cursor: pointer;
 }
 
 .message_you_template:hover .message_option,
@@ -380,4 +381,34 @@ body {
 
 .message_me_template .message_option {
   background-image: linear-gradient(to bottom left, #dcf8c5, #dcf8c5, transparent);
+}
+
+.message_you_template .message_option_menu,
+.message_me_template .message_option_menu {
+  display: none;
+  position: absolute;
+  top: 28px;
+  right: 8px;
+  z-index: 2;
+  padding: 9px 0;
+  border-radius: 3px;
+  list-style-type: none;
+  box-shadow: 0 0 5px 2px #bbbbbb;
+  background-color: white;
+}
+
+.message_you_template .message_option_menu li,
+.message_me_template .message_option_menu li {
+  display: block;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 24px;
+  color: #444444;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.message_you_template .message_option_menu li:hover,
+.message_me_template .message_option_menu li:hover {
+  background-color: #f4f5f5;
 }

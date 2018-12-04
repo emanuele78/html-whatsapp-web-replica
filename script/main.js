@@ -8,22 +8,42 @@ var whatsappController = {
     var thisObject = this;
     //handler per keyup su campo testo messaggio utente
     $(".input_message").keyup(function(event) {
-      if ($(this).val().length > 0) {
-        $(".message_send").show();
-        $(".message_record").hide();
-        if (event.keyCode == 13) {
-          //premuto tasto invio
-          thisObject.sendMessage();
-        }
-      } else {
-        $(".message_record").show();
-        $(".message_send").hide();
-      }
+      thisObject.handleAnimationOnInputMessage.call(thisObject, event);
     });
     //handler per il click sull'icona invio messaggio
     $(".message_send").click(function() {
       thisObject.sendMessage();
     });
+    //handler per il click sul menu contestuale del messaggio
+    $(".message_option").click(function() {
+      $(".message_option_menu").slideToggle(200);
+    });
+    //handler generico di chiusura elementi
+    $(document.body).click(function(e) {
+      var myElement = $(".message_option_menu_wrapper");
+      var contextMenuShowed = $(".message_option_menu").is(":visible");
+      var clickedOutsideMenu = !$.contains(myElement[0], e.target);
+      var target = $(e.target);
+      if (!target.hasClass("message_option_arrow")) {
+        if (contextMenuShowed && clickedOutsideMenu) {
+          $(".message_option_menu").slideToggle(200);
+        }
+      }
+    });
+  },
+  //metodo che gestisce le azimazioni sull'input message (microfono che si trasforma in freccia)
+  handleAnimationOnInputMessage: function(keyevent) {
+    if ($(".input_message").val().length > 0) {
+      $(".message_send").show();
+      $(".message_record").hide();
+      if (keyevent.keyCode == 13) {
+        //premuto tasto invio
+        this.sendMessage();
+      }
+    } else {
+      $(".message_record").show();
+      $(".message_send").hide();
+    }
   },
   //metodo che invia un nuovo messaggio
   sendMessage: function() {
