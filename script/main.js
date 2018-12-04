@@ -193,10 +193,6 @@ var whatsappController = {
     $(".message_send").click(function() {
       thisObject.sendMessage();
     });
-    //handler per il click sul menu contestuale del messaggio
-    $(".message_option").click(function() {
-      // $(".message_option_menu").slideToggle(200);
-    });
     //handler per i click sugli elementi conversazione
     $(".conversation_item_template").click(function() {
       var threadIndex = $(this).index();
@@ -216,6 +212,16 @@ var whatsappController = {
     //   }
     // });
   },
+  //questo metodo collega associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
+  attachMessageHandler: function() {
+    //closure
+    var thisObject = this;
+    //handler per il click sul menu contestuale del messaggio
+    $(".message_option").click(function() {
+      var element = $(this);
+      thisObject.manageMessageMenuClick.call(thisObject, element);
+    });
+  },
   //metodo che carica la conversazione scelta dall'utente. ThreadIndex è un valore con base 0 all'interno dell'array ma con base 1 per l'elemento all'interno del proprio container
   loadSingleThread: function(threadIndex) {
     //operazioni preliminari al caricamento della conversazione
@@ -232,6 +238,8 @@ var whatsappController = {
     //cancello il valore di eventuali messaggi non letti e nascondo segnalino
     this.showUnreadedMessageCount(threadIndex + 1, false);
     threadToLoad.unreadedMessageCount = 0;
+    //chiamo metodo per associare l'evento click sul menu contestuale
+    this.attachMessageHandler();
   },
   //metodo che prepara al caricamento dei messaggi per una conversazione scelta dall'utente
   prepareForLoadSingleThread: function(threadIndex) {
@@ -239,7 +247,7 @@ var whatsappController = {
     if ($(".message_home_screen").is(":visible")) {
       $(".message_home_screen").hide();
     }
-    //cancello eventuali messaggi presenti
+    //cancello eventuali messaggi presenti - il comando remove scarica anche gli eventi associati
     $(".messages_wrapper > div").remove();
     //imposto background white per tutte le conversazioni
     $(".conversation_item_template").removeClass("active_item");
@@ -400,6 +408,25 @@ var whatsappController = {
     } else {
       //nascondo
       element.hide();
+    }
+  },
+  manageMessageMenuClick: function(element) {
+    //se all'interno dell'elemento è presente il template del menu, esso è visualizzato quindi devo chiuderlo e rimuoverlo, altrimenti devo inserircelo
+    var targetElement = element.parent().find(".message_option_menu_wrapper");
+    var contextMenu = targetElement.find(".message_option_menu");
+    if (contextMenu.length > 0) {
+      //il menu contestuale è già presente - devo chiuderlo e rimuoverlo
+      contextMenu.slideToggle(200, function() {
+        $(".messages_wrapper  .message_option_menu").remove();
+      });
+    } else {
+      //il menu contestuale non esiste
+      //lo rimuovo da eventuali altri messaggi
+      $(".messages_wrapper  .message_option_menu").remove();
+      //lo inserisco nel messaggio cliccato
+      var clonedElement = $(".menu_template .message_option_menu").clone();
+      targetElement.append(clonedElement);
+      clonedElement.slideToggle(200);
     }
   }
 }

@@ -64,7 +64,7 @@ body {
   background-color: #28d1a6;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-  animation-duration: 3s;
+  animation-duration: .3s;
   animation-name: splash_animation;
 }
 
@@ -497,7 +497,8 @@ body {
 }
 
 /* TEMPLATE SINGOLI MESSAGGI */
-.messages_templates {
+.messages_templates,
+.menu_template {
   display: none;
 }
 
@@ -584,8 +585,7 @@ body {
   background-image: linear-gradient(to bottom left, #dcf8c5, #dcf8c5, transparent);
 }
 
-.message_you_template .message_option_menu,
-.message_me_template .message_option_menu {
+.message_option_menu {
   display: none;
   position: absolute;
   top: 28px;
@@ -598,8 +598,7 @@ body {
   background-color: white;
 }
 
-.message_you_template .message_option_menu li,
-.message_me_template .message_option_menu li {
+.message_option_menu li {
   display: block;
   height: 40px;
   line-height: 40px;
@@ -607,9 +606,9 @@ body {
   color: #444444;
   font-size: 15px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.message_you_template .message_option_menu li:hover,
-.message_me_template .message_option_menu li:hover {
+.message_option_menu li:hover {
   background-color: #f4f5f5;
 }
