@@ -1,6 +1,10 @@
 //solo per test
 "use strict";
 var whatsappController = {
+  //proprietà dell'oggetto
+  //range in secondi relativo al tempo massimo e al tempo minimo di auto risposta nella conversazione
+  minDelayReply: 2,
+  maxDelayReply: 3,
   //metodo iniziale
   initializeController: function() {
     //inizializzo proprietà dell'oggetto che contiene una lista messaggi fake da dove pescare messaggi random
@@ -230,12 +234,14 @@ var whatsappController = {
     if ($(".message_home_screen").is(":visible")) {
       $(".message_home_screen").hide();
     }
-    //cancello messaggi presenti
+    //cancello eventuali messaggi presenti
     $(".messages_wrapper > div").remove();
     //imposto background white per tutte le conversazioni
     $(".conversation_item_template").removeClass("active_item");
-    //imposto background selezionato solo per la conversazione selezionata
+    //imposto background selezionato solo per la conversazione aperta
     $(".conversation_item_template").eq(++threadIndex).addClass("active_item");
+    //imposto come proprietà dell'oggetto l'indice della conversazione aperta
+    this.openedThreadIndex = threadIndex;
   },
   //metodo che carica le informazioni su una conversazione
   loadSingleThreadInfo: function(threadToLoad) {
@@ -268,6 +274,8 @@ var whatsappController = {
     this.loadSingleMessage(messageObject);
     //cancello testo scritto nella input text
     $(".input_message").val("");
+    //memorizzo messaggio nella conversazione corrente
+    this.startedThreads[this.openedThreadIndex - 1].threadMessages.push(messageObject);
   },
   // metodo che carica un singolo oggetto messaggio nella conversazione
   loadSingleMessage: function(message) {
@@ -307,6 +315,7 @@ var whatsappController = {
     }
     return message;
   }
+  //metodo che genera una risposta fake quando l'utente invia un messaggio
 }
 
 $(document).ready(function() {
