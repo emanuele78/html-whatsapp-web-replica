@@ -3,8 +3,8 @@
 var whatsappController = {
   //proprietà dell'oggetto
   //range in secondi entro il quale l'altro utente riceve il messaggio inviato
-  minDelayReply: 2,
-  maxDelayReply: 3,
+  minDelayReply: 3,
+  maxDelayReply: 6,
   //tempo in secondi (statico) impiegato dall'altro utente, una volta ricevuto il messaggio, per rispondere. Per semplificare, il tempo che trascorre per ricevere una risposta automatica fake è dato da random(minDelayReply, maxDelayReply)+fixedDelay
   fixedDelay: 3,
   writingMessage: "Sto scrivendo...",

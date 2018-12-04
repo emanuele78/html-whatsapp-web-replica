@@ -11,6 +11,27 @@ body {
   display: flex;
 }
 
+/* webkit scrollbar */
+/* larghezza */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* binario di scorrimento */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* binario visibile */
+::-webkit-scrollbar-thumb {
+  background: rgba(93, 93, 93, 0.5);
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(93, 93, 93, 0.5);
+}
+
 /* splash screen */
 .splash_screen {
   position: absolute;
@@ -43,7 +64,7 @@ body {
   background-color: #28d1a6;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-  animation-duration: .3s;
+  animation-duration: 3s;
   animation-name: splash_animation;
 }
 
