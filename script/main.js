@@ -201,21 +201,10 @@ var whatsappController = {
     });
     //handler per la search bar quando ottiene il fuoco
     $(".search_bar_fake .input_search").focus(function() {
-      // $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
-      // $(".search_bar_icon_search").hide();
-      // $(".search_bar_icon_arrow").show();
-      // $(".conversations_search_bar").css("background-color", "white");
       thisObject.manageSearchBarGotFocus.call(thisObject);
     });
     //handler per la search bar quando rilascia il fuoco
     $(".search_bar_fake .input_search").focusout(function() {
-      // var duration = parseFloat($(".search_bar_icon_arrow ").css("animation-duration"));
-      // $(".search_bar_icon_arrow").css("animation-name", "search_bar_reverse_anim");
-      // $(".conversations_search_bar").css("background-color", "#fbfbfb");
-      // setTimeout(function() {
-      //   $(".search_bar_icon_search").show();
-      //   $(".search_bar_icon_arrow").hide();
-      // }, duration * 1000);
       thisObject.manageSearchBarLostFocus.call(thisObject);
     });
     // handler per la scrittura nella search bar
@@ -259,6 +248,8 @@ var whatsappController = {
     threadToLoad.unreadedMessageCount = 0;
     //chiamo metodo per associare l'evento click sul menu contestuale
     this.attachMessageHandler();
+    //imposto il fuoco sulla casella di ricerca
+    $(".message_compose .input_message").focus();
   },
   //metodo che prepara al caricamento dei messaggi per una conversazione scelta dall'utente
   prepareForLoadSingleThread: function(threadIndex) {
