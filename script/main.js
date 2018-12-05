@@ -25,7 +25,7 @@ var whatsappController = {
   createFakeThreads: function() {
     //queste sono le conversazioni presenti, nell'array è memorizzato il nome del destinatario e la il nome dell'immagine
     var startedThreads = [{
-        threadName: "Riccardo Silvi",
+        threadName: "Renzo Pariani",
         threadImage: "t1.jpg"
       },
       {
@@ -33,15 +33,15 @@ var whatsappController = {
         threadImage: "t2.jpg"
       },
       {
-        threadName: "Gianluca Bianco",
+        threadName: "Gianni Fermentini",
         threadImage: "t3.jpg"
       },
       {
-        threadName: "Chiara Passaro",
+        threadName: "Maria Cedro",
         threadImage: "t4.jpg"
       },
       {
-        threadName: "Matteo Pelosi",
+        threadName: "Marco Palude",
         threadImage: "t5.jpg"
       },
       {
@@ -75,7 +75,7 @@ var whatsappController = {
       var addedMinutes = this.getIntRandomNumber(3600, 9000);
       startDate = this.increaseDate(startDate, addedMinutes);
       //ottengo una frase casuale dall'elenco
-      var textMessage = this.sampleMessages[this.getIntRandomNumber(0, this.sampleMessages.length)];
+      var textMessage = this.sampleMessages[this.getIntRandomNumber(0, this.sampleMessages.length - 1)];
       //creo oggetto messaggio e lo pusho nell'array
       messages.push(this.createMessage(startDate, textMessage, myMessage));
     }
@@ -199,18 +199,6 @@ var whatsappController = {
       // passo l'index 0-based
       thisObject.loadSingleThread.call(thisObject, --threadIndex);
     });
-    //handler generico di chiusura elementi
-    // $(document.body).click(function(e) {
-    //   var myElement = $(".message_option_menu_wrapper");
-    //   var contextMenuShowed = $(".message_option_menu").is(":visible");
-    //   var clickedOutsideMenu = !$.contains(myElement[0], e.target);
-    //   var target = $(e.target);
-    //   if (!target.hasClass("message_option_arrow")) {
-    //     if (contextMenuShowed && clickedOutsideMenu) {
-    //       $(".message_option_menu").slideToggle(200);
-    //     }
-    //   }
-    // });
   },
   //questo metodo collega associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
   attachMessageHandler: function() {
@@ -220,6 +208,13 @@ var whatsappController = {
     $(".message_option").click(function() {
       var element = $(this);
       thisObject.manageMessageMenuClick.call(thisObject, element);
+    });
+    //handler generico di chiusura elementi
+    $(document.body).click(function(e) {
+      var target = $(e.target);
+      if (!target.hasClass("context_menu_arrow") && !target.hasClass("context_menu_path") && !target.hasClass("message_option_menu") && !target.hasClass("menu_other") && !target.hasClass("menu_delete")) {
+        $(".messages_wrapper .message_option_menu").remove();
+      }
     });
   },
   //metodo che carica la conversazione scelta dall'utente. ThreadIndex è un valore con base 0 all'interno dell'array ma con base 1 per l'elemento all'interno del proprio container
@@ -417,7 +412,7 @@ var whatsappController = {
     if (contextMenu.length > 0) {
       //il menu contestuale è già presente - devo chiuderlo e rimuoverlo
       contextMenu.slideToggle(200, function() {
-        $(".messages_wrapper  .message_option_menu").remove();
+        $(".messages_wrapper .message_option_menu").remove();
       });
     } else {
       //il menu contestuale non esiste
