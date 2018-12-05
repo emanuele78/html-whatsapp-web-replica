@@ -465,6 +465,8 @@ var whatsappController = {
     $(".conversations_items > .conversation_item_template").each(function() {
       $(this).show();
     });
+    //rimuovo titolo risultati ricerca
+    $(".search_results_title").slideUp();
     //avvio il timer che mi permette di ripristinare in modo simile all'originale l'icona della lente
     setTimeout(function() {
       $(".search_bar_icon_search").show();
@@ -473,10 +475,17 @@ var whatsappController = {
   },
   manageUserSearch: function() {
     var inputText = $(".search_bar_fake .input_search").val();
+    //mostro/nascondo elemento titolo
+    console.log(inputText.length);
+    if (inputText.length == 0) {
+      $(".search_results_title").slideUp();
+    } else {
+      $(".search_results_title").slideDown();
+    }
     //ciclo sulle conversazioni
     $(".conversations_items > .conversation_item_template").each(function() {
       var threadName = $(this).find(".item_name").text();
-      if (threadName.toLowerCase().includes(inputText)) {
+      if (threadName.toLowerCase().includes(inputText.toLowerCase())) {
         $(this).show();
       } else {
         $(this).hide();
