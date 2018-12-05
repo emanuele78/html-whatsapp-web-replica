@@ -199,6 +199,22 @@ var whatsappController = {
       // passo l'index 0-based
       thisObject.loadSingleThread.call(thisObject, --threadIndex);
     });
+    //handler per la search bar
+    $(".search_bar_fake .input_search").focus(function() {
+      $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
+      $(".search_bar_icon_search").hide();
+      $(".search_bar_icon_arrow").show();
+      $(".conversations_search_bar").css("background-color", "white");
+    });
+    $(".search_bar_fake .input_search").focusout(function() {
+      var duration = parseFloat($(".search_bar_icon_arrow ").css("animation-duration"));
+      $(".search_bar_icon_arrow").css("animation-name", "search_bar_reverse_anim");
+      $(".conversations_search_bar").css("background-color", "#fbfbfb");
+      setTimeout(function() {
+        $(".search_bar_icon_search").show();
+        $(".search_bar_icon_arrow").hide();
+      }, duration * 1000);
+    });
   },
   //questo metodo collega associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
   attachMessageHandler: function() {
@@ -209,10 +225,11 @@ var whatsappController = {
       var element = $(this);
       thisObject.manageMessageMenuClick.call(thisObject, element);
     });
-    //handler generico di chiusura elementi
+    //handler per la chiusura del menu contestuale quando si clicca fuori da esso
     $(document.body).click(function(e) {
       var target = $(e.target);
-      if (!target.hasClass("context_menu_arrow") && !target.hasClass("context_menu_path") && !target.hasClass("message_option_menu") && !target.hasClass("menu_other") && !target.hasClass("menu_delete")) {
+      if (!target.hasClass("context_menu_arrow") && !target.hasClass("message_option_menu") && !target.hasClass("menu_other") && !target.hasClass("menu_delete")) {
+        //rimuovo il menu, questa operazione viene effettuata anche nel caso in cui il menu non sia visualizzato
         $(".messages_wrapper .message_option_menu").remove();
       }
     });

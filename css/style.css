@@ -64,7 +64,7 @@ body {
   background-color: #28d1a6;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-  animation-duration: .3s;
+  animation-duration: 3s;
   animation-name: splash_animation;
 }
 
@@ -84,7 +84,7 @@ body {
 
 .main_content_wrapper {
   display: flex;
-  max-width: 1440px;
+  width: 1440px;
   height: 96%;
   margin: auto;
 }
@@ -116,12 +116,14 @@ body {
 /* 2 SEZIONI PRINCIPALI */
 .conversations {
   width: 35%;
+  min-width: 450px;
   height: 100%;
 }
 
 .message {
   position: relative;
   width: 65%;
+  min-width: 600px;
   height: 100%;
   background-image: url("../assets/message_bkg.png");
   background-size: 400px;
@@ -188,6 +190,7 @@ body {
   padding: 10px 16px;
   border-bottom: 1px solid #ebebeb;
   background-color: #fbfbfb;
+  box-shadow: 0 2px 2px -2px red;
 }
 
 .conversations_search_bar .search_bar_fake {
@@ -206,10 +209,58 @@ body {
   margin-left: 16px;
 }
 
-.conversations_search_bar .search_bar_fake span {
-  font-size: 15px;
-  color: #a4a4a4;
-  margin-left: 16px;
+.search_bar_fake .input_search {
+  flex-grow: 1;
+  padding-left: 20px;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  font-size: 14px;
+  color: #4b4b4b;
+  background-color: white;
+}
+
+.search_bar_icon_arrow {
+  display: none;
+}
+
+.search_bar_icon_arrow {
+  animation-duration: .2s;
+  animation-timing-function: linear;
+}
+
+@keyframes search_bar_anim {
+  0% {
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: rotate(-90deg);
+    opacity: .8;
+  }
+
+  100% {
+    transform: rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes search_bar_reverse_anim {
+  0% {
+    transform: rotate(0);
+    opacity: 1;
+  }
+
+  50% {
+    transform: rotate(-90deg);
+    opacity: .5;
+  }
+
+  100% {
+    transform: rotate(-180deg);
+    opacity: 0;
+  }
 }
 
 /* ELEMENTI DELLA SEZIONE MESSAGE */
