@@ -64,7 +64,7 @@ body {
   background-color: #28d1a6;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-  animation-duration: 3s;
+  animation-duration: .3s;
   animation-name: splash_animation;
 }
 
@@ -190,7 +190,6 @@ body {
   padding: 10px 16px;
   border-bottom: 1px solid #ebebeb;
   background-color: #fbfbfb;
-  box-shadow: 0 2px 2px -2px red;
 }
 
 .conversations_search_bar .search_bar_fake {

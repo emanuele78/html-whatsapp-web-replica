@@ -199,21 +199,28 @@ var whatsappController = {
       // passo l'index 0-based
       thisObject.loadSingleThread.call(thisObject, --threadIndex);
     });
-    //handler per la search bar
+    //handler per la search bar quando ottiene il fuoco
     $(".search_bar_fake .input_search").focus(function() {
-      $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
-      $(".search_bar_icon_search").hide();
-      $(".search_bar_icon_arrow").show();
-      $(".conversations_search_bar").css("background-color", "white");
+      // $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
+      // $(".search_bar_icon_search").hide();
+      // $(".search_bar_icon_arrow").show();
+      // $(".conversations_search_bar").css("background-color", "white");
+      thisObject.manageSearchBarGotFocus.call(thisObject);
     });
+    //handler per la search bar quando rilascia il fuoco
     $(".search_bar_fake .input_search").focusout(function() {
-      var duration = parseFloat($(".search_bar_icon_arrow ").css("animation-duration"));
-      $(".search_bar_icon_arrow").css("animation-name", "search_bar_reverse_anim");
-      $(".conversations_search_bar").css("background-color", "#fbfbfb");
-      setTimeout(function() {
-        $(".search_bar_icon_search").show();
-        $(".search_bar_icon_arrow").hide();
-      }, duration * 1000);
+      // var duration = parseFloat($(".search_bar_icon_arrow ").css("animation-duration"));
+      // $(".search_bar_icon_arrow").css("animation-name", "search_bar_reverse_anim");
+      // $(".conversations_search_bar").css("background-color", "#fbfbfb");
+      // setTimeout(function() {
+      //   $(".search_bar_icon_search").show();
+      //   $(".search_bar_icon_arrow").hide();
+      // }, duration * 1000);
+      thisObject.manageSearchBarLostFocus.call(thisObject);
+    });
+    // handler per la scrittura nella search bar
+    $(".search_bar_fake .input_search").keyup(function() {
+      thisObject.manageUserSearch.call(thisObject);
     });
   },
   //questo metodo collega associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
@@ -440,6 +447,41 @@ var whatsappController = {
       targetElement.append(clonedElement);
       clonedElement.slideToggle(200);
     }
+  },
+  manageSearchBarGotFocus: function() {
+    $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
+    $(".search_bar_icon_search").hide();
+    $(".search_bar_icon_arrow").show();
+    $(".conversations_search_bar").css("background-color", "white");
+  },
+  manageSearchBarLostFocus: function() {
+    //ottengo la durata dell'animazione, trascorsa la quale nascondo la freccia
+    var duration = parseFloat($(".search_bar_icon_arrow ").css("animation-duration"));
+    $(".search_bar_icon_arrow").css("animation-name", "search_bar_reverse_anim");
+    $(".conversations_search_bar").css("background-color", "#fbfbfb");
+    //cancello testo inserito dall'utente
+    $(".search_bar_fake .input_search").val("");
+    //ripristino visibilità thread eventualmente nascosti
+    $(".conversations_items > .conversation_item_template").each(function() {
+      $(this).show();
+    });
+    //avvio il timer che mi permette di ripristinare in modo simile all'originale l'icona della lente
+    setTimeout(function() {
+      $(".search_bar_icon_search").show();
+      $(".search_bar_icon_arrow").hide();
+    }, duration * 1000);
+  },
+  manageUserSearch: function() {
+    var inputText = $(".search_bar_fake .input_search").val();
+    //ciclo sulle conversazioni
+    $(".conversations_items > .conversation_item_template").each(function() {
+      var threadName = $(this).find(".item_name").text();
+      if (threadName.toLowerCase().includes(inputText)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
   }
 }
 
