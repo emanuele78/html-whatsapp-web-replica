@@ -3,10 +3,10 @@
 var whatsappController = {
   //proprietà dell'oggetto
   //range in secondi entro il quale l'altro utente riceve il messaggio inviato
-  minDelayReply: 3,
-  maxDelayReply: 6,
+  minDelayReply: 2,
+  maxDelayReply: 4,
   //tempo in secondi (statico) impiegato dall'altro utente, una volta ricevuto il messaggio, per rispondere. Per semplificare, il tempo che trascorre per ricevere una risposta automatica fake è dato da random(minDelayReply, maxDelayReply)+fixedDelay
-  fixedDelay: 3,
+  fixedDelay: 2,
   writingMessage: "Sto scrivendo...",
   //metodo iniziale
   initializeController: function() {
@@ -26,35 +26,43 @@ var whatsappController = {
     //queste sono le conversazioni presenti, nell'array è memorizzato il nome del destinatario e la il nome dell'immagine
     var startedThreads = [{
         threadName: "Renzo Pariani",
-        threadImage: "t1.jpg"
+        threadImage: "t1.jpg",
+        threadId: "wh1"
       },
       {
         threadName: "Federica Stella",
-        threadImage: "t2.jpg"
+        threadImage: "t2.jpg",
+        threadId: "wh2"
       },
       {
         threadName: "Gianni Fermentini",
-        threadImage: "t3.jpg"
+        threadImage: "t3.jpg",
+        threadId: "wh3"
       },
       {
         threadName: "Maria Cedro",
-        threadImage: "t4.jpg"
+        threadImage: "t4.jpg",
+        threadId: "wh4"
       },
       {
         threadName: "Marco Palude",
-        threadImage: "t5.jpg"
+        threadImage: "t5.jpg",
+        threadId: "wh5"
       },
       {
         threadName: "Mario Rossi",
-        threadImage: "t6.jpg"
+        threadImage: "t6.jpg",
+        threadId: "wh6"
       },
       {
         threadName: "Franco Franchi",
-        threadImage: "t7.jpg"
+        threadImage: "t7.jpg",
+        threadId: "wh7"
       },
       {
-        threadName: "Giorgio Trobbiani",
-        threadImage: "t8.jpg"
+        threadName: "Giorgio Maninsaldi",
+        threadImage: "t8.jpg",
+        threadId: "wh8"
       }
     ];
     //per ogni elemento dell'array creo una conversazione fittizia fatta da un numero random di scambio messaggi e la pusho nell'array stesso
@@ -62,7 +70,7 @@ var whatsappController = {
       startedThreads[i].threadMessages = this.getFakeConversation(this.getIntRandomNumber(8, 20));
     }
     this.startedThreads = startedThreads;
-    console.log(this.startedThreads);
+    // console.log(this.startedThreads);
   },
   //metodo che crea i messaggi della conversazione fake
   getFakeConversation: function(messagesCount) {
@@ -88,7 +96,9 @@ var whatsappController = {
       //conversazione corrente
       var threadObject = this.startedThreads[i];
       //template clonato
-      var clonedElement = $(".conversations_items .template .conversation_item_template").clone();
+      var clonedElement = $(".template .conversation_item_template").clone();
+      //imposto l'id univoco
+      clonedElement.attr("id", threadObject.threadId);
       //imposto il nome della persona con cui si ha la conversazione
       clonedElement.find(".item_name").text(threadObject.threadName);
       //imposto l'immagine della persona
@@ -194,7 +204,7 @@ var whatsappController = {
       thisObject.sendMessage();
     });
     //handler per i click sugli elementi conversazione
-    $(".conversation_item_template").click(function() {
+    $(".conversation_item_template").click(function(e) {
       var threadIndex = $(this).index();
       // passo l'index 0-based
       thisObject.loadSingleThread.call(thisObject, --threadIndex);
@@ -212,7 +222,7 @@ var whatsappController = {
       thisObject.manageUserSearch.call(thisObject);
     });
   },
-  //questo metodo collega associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
+  //questo metodo associa l'evento click sul menu contestuale dei messaggi e deve essere chiamato ogni qual volta si cambia thread
   attachMessageHandler: function() {
     //closure
     var thisObject = this;
@@ -248,8 +258,9 @@ var whatsappController = {
     threadToLoad.unreadedMessageCount = 0;
     //chiamo metodo per associare l'evento click sul menu contestuale
     this.attachMessageHandler();
-    //imposto il fuoco sulla casella di ricerca
+    //imposto il fuoco sulla casella di ricerca e cancello eventuali valori presenti
     $(".message_compose .input_message").focus();
+    $(".message_compose .input_message").val("");
   },
   //metodo che prepara al caricamento dei messaggi per una conversazione scelta dall'utente
   prepareForLoadSingleThread: function(threadIndex) {
@@ -304,6 +315,8 @@ var whatsappController = {
     this.startedThreads[this.openedThreadIndex - 1].threadMessages.push(messageObject);
     //chiamo procedura per generare una risposta automatica
     this.createFakeReply(this.openedThreadIndex);
+    //chiamata la metodo che gestisce lo spostamento
+    // this.changeOrder(this.openedThreadIndex);
   },
   // metodo che carica un singolo oggetto messaggio nella conversazione
   loadSingleMessage: function(message) {
@@ -437,7 +450,21 @@ var whatsappController = {
       var clonedElement = $(".menu_template .message_option_menu").clone();
       targetElement.append(clonedElement);
       clonedElement.slideToggle(200);
+      //associo handler per il click sulle voci della dropdown
+      var thisObject = this;
+      $(".message_option_menu .menu_delete").click(function(event) {
+        thisObject.deleteMessage.call(thisObject, event);
+      });
     }
+  },
+  deleteMessage: function(event) {
+    var messageToDeleteElement = $(event.target).parent().parent().parent();
+    var messageToDeleteIndex = messageToDeleteElement.index();
+    var data = this.startedThreads[this.openedThreadIndex - 1];
+    //cancello elemento dal DOM
+    messageToDeleteElement.remove();
+    //cancello elemento dall'array
+    data.threadMessages.splice(messageToDeleteIndex, 1);
   },
   manageSearchBarGotFocus: function() {
     $(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
@@ -467,7 +494,6 @@ var whatsappController = {
   manageUserSearch: function() {
     var inputText = $(".search_bar_fake .input_search").val();
     //mostro/nascondo elemento titolo
-    console.log(inputText.length);
     if (inputText.length == 0) {
       $(".search_results_title").slideUp();
     } else {
@@ -482,6 +508,23 @@ var whatsappController = {
         $(this).hide();
       }
     });
+  },
+  //metodo da definire - NON UTILIZZATO
+  changeOrder: function(currentIndex) {
+    console.log(this.openedThreadIndex);
+    if (currentIndex > 1) {
+      //devo spostare
+      console.log(currentIndex);
+      var elementToMove = $(".conversation_item_template.active_item");
+      elementToMove.detach();
+      $(".conversations_items .conversation_item_template").eq(--currentIndex).before(elementToMove);
+      var thisObject = this;
+      setTimeout(function() {
+        thisObject.changeOrder(currentIndex);
+      }, 300);
+    } else {
+      //aggiorno la proprietà thread index
+    }
   }
 }
 
