@@ -62,7 +62,7 @@ body {
 	width: 0;
 	height: 100%;
 	animation-name: splash_animation;
-	animation-duration: 3s;
+	animation-duration: .3s;
 	animation-timing-function: ease;
 	background-color: #28d1a6;
 	animation-fill-mode: forwards;

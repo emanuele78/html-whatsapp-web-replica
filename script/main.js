@@ -24,11 +24,12 @@ var whatsappController = {
 	//metodo che crea le conversazioni finte
 	createFakeThreads: function () {
 		//queste sono le conversazioni presenti, nell'array è memorizzato il nome del destinatario e la il nome dell'immagine
-		var startedThreads = [{
-			threadName: "Renzo Pariani",
-			threadImage: "t1.jpg",
-			threadId: "wh1"
-		},
+		var startedThreads = [
+			{
+				threadName: "Renzo Pariani",
+				threadImage: "t1.jpg",
+				threadId: "wh1"
+			},
 			{
 				threadName: "Federica Stella",
 				threadImage: "t2.jpg",
@@ -70,7 +71,6 @@ var whatsappController = {
 			startedThreads[i].threadMessages = this.getFakeConversation(this.getIntRandomNumber(8, 20));
 		}
 		this.startedThreads = startedThreads;
-		// console.log(this.startedThreads);
 	},
 	//metodo che crea i messaggi della conversazione fake
 	getFakeConversation: function (messagesCount) {
@@ -204,10 +204,11 @@ var whatsappController = {
 			thisObject.sendMessage();
 		});
 		//handler per i click sugli elementi conversazione
-		$(".conversation_item_template").click(function (e) {
+		$(".conversation_item_template").click(function () {
 			var threadIndex = $(this).index();
-			// passo l'index 0-based
-			thisObject.loadSingleThread.call(thisObject, threadIndex);
+			var threadId = $(this).attr("id");
+			// passo l'index 0-based e l'id univoco della conversazione
+			thisObject.loadSingleThread.call(thisObject, threadIndex, threadId);
 		});
 		//handler per la search bar quando ottiene il fuoco
 		$(".search_bar_fake .input_search").focus(function () {
@@ -241,9 +242,9 @@ var whatsappController = {
 		});
 	},
 	//metodo che carica la conversazione scelta dall'utente. ThreadIndex è un valore con base 0 all'interno dell'array ma con base 1 per l'elemento all'interno del proprio container
-	loadSingleThread: function (threadIndex) {
+	loadSingleThread: function (threadIndex, threadId) {
 		//operazioni preliminari al caricamento della conversazione
-		this.prepareForLoadSingleThread(threadIndex);
+		this.prepareForLoadSingleThread(threadIndex, threadId);
 		// ottengo conversazione dall'array
 		var threadToLoad = this.startedThreads[threadIndex];
 		//caricamento delle info generali sulla conversazione (nome, ultimo accesso, foto)
@@ -254,16 +255,17 @@ var whatsappController = {
 			this.loadSingleMessage(threadMessages[i]);
 		}
 		//cancello il valore di eventuali messaggi non letti e nascondo segnalino
-		this.showUnreadedMessageCount(threadIndex, false);
+		this.showUnreadedMessageCount(threadId, false);
+		// this.showUnreadedMessageCount(threadIndex, false);
 		threadToLoad.unreadedMessageCount = 0;
 		//chiamo metodo per associare l'evento click sul menu contestuale
 		this.attachMessageHandler();
 		//imposto il fuoco sulla casella di ricerca e cancello eventuali valori presenti
-		$(".message_compose .input_message").focus();
 		$(".message_compose .input_message").val("");
+		$(".message_compose .input_message").focus();
 	},
 	//metodo che prepara al caricamento dei messaggi per una conversazione scelta dall'utente
-	prepareForLoadSingleThread: function (threadIndex) {
+	prepareForLoadSingleThread: function (threadIndex, threadId) {
 		//se la home screen è visualizzata devo nasconderla
 		if ($(".message_home_screen").is(":visible")) {
 			$(".message_home_screen").hide();
@@ -273,9 +275,10 @@ var whatsappController = {
 		//imposto background white per tutte le conversazioni
 		$(".conversation_item_template").removeClass("active_item");
 		//imposto background selezionato solo per la conversazione aperta
-		$(".conversation_item_template").eq(threadIndex).addClass("active_item");
-		//imposto come proprietà dell'oggetto l'indice della conversazione aperta
+		$(".conversations_items " + "#" + threadId).addClass("active_item");
+		//imposto come proprietà dell'oggetto l'indice della conversazione aperta e l'id univoco conversazione
 		this.openedThreadIndex = threadIndex;
+		this.openedThreadId = threadId;
 	},
 	//metodo che carica le informazioni su una conversazione
 	loadSingleThreadInfo: function (threadToLoad) {
@@ -306,17 +309,24 @@ var whatsappController = {
 	//metodo che invia un nuovo messaggio
 	sendMessage: function () {
 		//creo oggetto messaggio dal testo dell'utente
-		var messageObject = this.createMessage(new Date(), $(".input_message").val(), true);
+		var userInput = $(".input_message").val();
+		var messageObject = this.createMessage(new Date(), userInput, true);
 		//chiamo metodo che si occupa di inserire il messaggio all'interno del container
 		this.loadSingleMessage(messageObject);
 		//cancello testo scritto nella input text
 		$(".input_message").val("");
 		//memorizzo messaggio nella conversazione corrente
-		this.startedThreads[this.openedThreadIndex].threadMessages.push(messageObject);
+		var thisObject = this;
+		var currentThread = this.startedThreads.find(function (thread) {
+			return thread.threadId == thisObject.openedThreadId;
+		});
+		currentThread.threadMessages.push(messageObject);
 		//chiamo procedura per generare una risposta automatica
-		this.createFakeReply(this.openedThreadIndex);
+		this.createFakeReply(this.openedThreadId);
 		//chiamata la metodo che gestisce lo spostamento
 		// this.changeOrder(this.openedThreadIndex);
+		//chiamo metodo che aggiorna il chunck dell'ultimo messaggio nella conversazione
+		this.updateLastMessageChunk(this.openedThreadId, userInput);
 	},
 	// metodo che carica un singolo oggetto messaggio nella conversazione
 	loadSingleMessage: function (message) {
@@ -357,7 +367,7 @@ var whatsappController = {
 		return message;
 	},
 	//metodo che genera una risposta fake quando l'utente invia un messaggio
-	createFakeReply: function (callingIndex) {
+	createFakeReply: function (threadId) {
 		//closure
 		var thisObject = this;
 		//il delay della risposta è espresso in sec
@@ -366,23 +376,26 @@ var whatsappController = {
 			//genero un nuovo oggetto messaggio con data attuale e testo casuale
 			var incomingMessage = thisObject.createMessage(new Date(), thisObject.sampleMessages[thisObject.getIntRandomNumber(0, thisObject.sampleMessages.length - 1)], false);
 			//utilizzo call per impostare l'oggetto this mel metodo chiamato
-			thisObject.askToSomeoneToStartWritingAMessage.call(thisObject, incomingMessage, callingIndex);
+			thisObject.askToSomeoneToStartWritingAMessage.call(thisObject, incomingMessage, threadId);
 		}, delay * 1000);
 	},
 	//questo metodo simula la scrittura da parte dell'altra persona
+	//imposto nel thread che l'altro utente sta scrivendo. Viene usato un numero intero per tenere traccia del numero dei messaggi da rispondere
+	//controllo se la proprietà esiste
 	askToSomeoneToStartWritingAMessage: function (incomingMessage, threadIndex) {
-		//imposto nel thread che l'altro utente sta scrivendo. Viene usato un numero intero per tenere traccia del numero dei messaggi da rispondere
-		//controllo se la proprietà esiste
+		//cerco il thread nell'array
+		var currentThread = this.startedThreads.find(function (thread) {
+			return thread.threadId == threadIndex;
+		});
 		console.log("Ho iniziato a risponderti");
-		if ("iAmWritingCount" in this.startedThreads[threadIndex]) {
+		if ("iAmWritingCount" in currentThread) {
 			//esiste quindi la posso incrementare
-			this.startedThreads[threadIndex].iAmWritingCount++;
+			currentThread.iAmWritingCount++;
 		} else {
 			//non esiste quindi la imposto a 1
-			this.startedThreads[threadIndex].iAmWritingCount = 1;
+			currentThread.iAmWritingCount = 1;
 		}
-		//se il thread corrente è lo stesso thread a cui si sta rispondendo, modifico l'head
-		if (threadIndex == this.openedThreadIndex) {
+		if (this.openedThreadId == threadIndex) {
 			$(".message_header_status a.last_access").text(this.writingMessage);
 		}
 		//aspetto un tempo (fisso) per simulare la scrittura dell'altro utente
@@ -393,41 +406,51 @@ var whatsappController = {
 		}, thisObject.fixedDelay * 1000);
 	},
 	//questo metodo gestisce il messaggio in ingresso (quello generato in automatico dopo che ne è stato inviato uno)
-	messageReceived: function (incomingMessage, threadIndex) {
+	messageReceived: function (incomingMessage, threadId) {
 		//salvo il messaggio ricevuto nel thread
-		this.startedThreads[threadIndex].threadMessages.push(incomingMessage);
+		var currentThread = this.startedThreads.find(function (thread) {
+			return thread.threadId == threadId;
+		});
+		currentThread.threadMessages.push(incomingMessage);
 		//se la conversazione attualmente aperta è relativa al messaggio in ingresso, inserisco il messaggio nel container e lo stampo a video
 		console.log("messaggio ricevuto dall'utente");
-		if (threadIndex == this.openedThreadIndex) {
+		if (threadId == this.openedThreadId) {
 			//aggiungo il messaggio nel container
 			this.loadSingleMessage(incomingMessage);
 		} else {
 			//devo mostrare segnalino con numero messaggi non letti
-			this.addUnreadedMessageToThread(threadIndex);
+			this.addUnreadedMessageToThread(threadId);
 		}
 		//decremento valore iAmWritingCount, se il valore arriva a zero tolgo la scritta Sto scrivendo
-		if (--this.startedThreads[threadIndex].iAmWritingCount == 0) {
+		if (--currentThread.iAmWritingCount == 0) {
 			$(".message_header_status a.last_access").text(this.getLastAccess());
 		}
+		//aggiorno last message chunck
+		this.updateLastMessageChunk(threadId, incomingMessage.messageContent);
 	},
-	addUnreadedMessageToThread: function (threadIndex) {
-		if ("unreadedMessageCount" in this.startedThreads[threadIndex]) {
-			//la proprietà esiste - incremento il valore
-			this.startedThreads[threadIndex].unreadedMessageCount++;
+	addUnreadedMessageToThread: function (threadId) {
+		var currentThread = this.startedThreads.find(function (thread) {
+			return thread.threadId == threadId;
+		});
+		if ("unreadedMessageCount" in currentThread) {
+			currentThread.unreadedMessageCount++;
 		} else {
-			//la proprietà non esiste, il valore è 1
-			this.startedThreads[threadIndex].unreadedMessageCount = 1;
+			currentThread.unreadedMessageCount = 1;
 		}
 		//chiamo il metodo per mostrare il valore
-		this.showUnreadedMessageCount(threadIndex, true)
+		this.showUnreadedMessageCount(threadId, true)
 	},
 	showUnreadedMessageCount: function (threadIndex, show) {
-		var element = $(".conversation_item_template").eq(threadIndex).find(".item_info_unreaded");
+		var element = $(".conversations_items " + "#" + threadIndex).find(".item_info_unreaded");
+		// var element = $(".conversation_item_template").eq(threadIndex).find(".item_info_unreaded");
 		if (show) {
 			//rendo visibile
 			element.css("display", "inline-block");
 			//imposto il contenuto
-			element.text(this.startedThreads[threadIndex].unreadedMessageCount);
+			var currentThread = this.startedThreads.find(function (thread) {
+				return thread.threadId == threadIndex;
+			});
+			element.text(currentThread.unreadedMessageCount);
 		} else {
 			//nascondo
 			element.hide();
@@ -460,11 +483,14 @@ var whatsappController = {
 	deleteMessage: function (event) {
 		var messageToDeleteElement = $(event.target).parent().parent().parent();
 		var messageToDeleteIndex = messageToDeleteElement.index();
-		var data = this.startedThreads[this.openedThreadIndex];
+		var thisObject = this;
+		var currentThread = this.startedThreads.find(function (thread) {
+			return thread.threadId == thisObject.openedThreadId;
+		});
 		//cancello elemento dal DOM
 		messageToDeleteElement.remove();
 		//cancello elemento dall'array
-		data.threadMessages.splice(messageToDeleteIndex, 1);
+		currentThread.threadMessages.splice(messageToDeleteIndex, 1);
 	},
 	manageSearchBarGotFocus: function () {
 		$(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
@@ -509,13 +535,16 @@ var whatsappController = {
 			}
 		});
 	},
+	// questo metodo si accupa di aggiornare l'ultima parte di messaggio visualizzata nella singola conversazione
+	updateLastMessageChunk: function (threadId, lastMessageChunck) {
+		var currentThread = $(".conversations_items " + "#" + threadId);
+		currentThread.find(".item_message_part").text(lastMessageChunck);
+	},
 	//metodo da definire - NON UTILIZZATO
 	changeOrder: function (currentIndex) {
-		console.log(this.openedThreadIndex);
 		if (currentIndex > 1) {
 			//devo spostare
-			console.log(currentIndex);
-			var elementToMove = $(".conversation_item_template.active_item");
+			var elementToMove = $(".conversations_items " + "#" + this.openedThreadId);
 			elementToMove.detach();
 			$(".conversations_items .conversation_item_template").eq(--currentIndex).before(elementToMove);
 			var thisObject = this;
