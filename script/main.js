@@ -491,6 +491,12 @@ var whatsappController = {
 		messageToDeleteElement.remove();
 		//cancello elemento dall'array
 		currentThread.threadMessages.splice(messageToDeleteIndex, 1);
+		//aggiorno chunk messaggio nella lista conversazioni
+		if (currentThread.threadMessages.length == 0) {
+			this.updateLastMessageChunk(this.openedThreadId, "");
+		} else {
+			this.updateLastMessageChunk(this.openedThreadId, currentThread.threadMessages[currentThread.threadMessages.length - 1].messageContent);
+		}
 	},
 	manageSearchBarGotFocus: function () {
 		$(".search_bar_icon_arrow").css("animation-name", "search_bar_anim");
