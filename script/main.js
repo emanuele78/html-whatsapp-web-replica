@@ -323,10 +323,10 @@ var whatsappController = {
 		currentThread.threadMessages.push(messageObject);
 		//chiamo procedura per generare una risposta automatica
 		this.createFakeReply(this.openedThreadId);
-		//chiamata la metodo che gestisce lo spostamento
-		// this.changeOrder(this.openedThreadIndex);
 		//chiamo metodo che aggiorna il chunck dell'ultimo messaggio nella conversazione
 		this.updateLastMessageChunk(this.openedThreadId, userInput);
+		//chiamata la metodo che gestisce lo spostamento
+		this.changeOrder();
 	},
 	// metodo che carica un singolo oggetto messaggio nella conversazione
 	loadSingleMessage: function (message) {
@@ -546,19 +546,18 @@ var whatsappController = {
 		var currentThread = $(".conversations_items " + "#" + threadId);
 		currentThread.find(".item_message_part").text(lastMessageChunck);
 	},
-	//metodo da definire - NON UTILIZZATO
-	changeOrder: function (currentIndex) {
-		if (currentIndex > 1) {
-			//devo spostare
-			var elementToMove = $(".conversations_items " + "#" + this.openedThreadId);
+	//quando l'utente scrive un messaggio, questo viene portato in cima alla pila conversazioni
+	changeOrder: function () {
+		var elementToMove = $(".conversations_items " + "#" + this.openedThreadId);
+		var currentIndex = elementToMove.index();
+		if (currentIndex > 0) {
+			//sposto indietro finché l'index dell'elemento non diviene 0
 			elementToMove.detach();
 			$(".conversations_items .conversation_item_template").eq(--currentIndex).before(elementToMove);
 			var thisObject = this;
 			setTimeout(function () {
-				thisObject.changeOrder(currentIndex);
-			}, 300);
-		} else {
-			//aggiorno la proprietà thread index
+				thisObject.changeOrder();
+			}, 30);
 		}
 	}
 }
